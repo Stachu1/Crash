@@ -3,8 +3,9 @@ import sys, select, time, random, os
 
 class Color:
     RED = "\x1b[0;31m"
-    GREEN = "\x1b[0;32m"
+    ORANGE = "\x1b[38;5;214m"
     YELLOW = "\x1b[0;33m"
+    GREEN = "\x1b[0;32m"
     CYAN = "\x1b[0;36m"
     BLUE = "\x1b[0;34m"
     PURPLE = "\x1b[0;35m"
@@ -17,10 +18,9 @@ class Crash:
         self.fee = fee
         self.multiplier_tick = multiplier_tick
         self.bet = None
-    
+        self.rocket_trail = " "*200 + "."*50 + f",,,:;;*!!&&%$#@@"
     
     def get_crash_point(self):
-        return 1000
         rnd = random.random()
         if rnd == 0:
             return self.get_crash_point()
@@ -51,17 +51,17 @@ class Crash:
     def go(self, crash_point):
         multiplier = 1
         while True:
-            print(self.rocket(multiplier, crash_point), end="\r")
+            print(Color.ORANGE + self.rocket(multiplier), end="\r")
 
             time.sleep(0.1)
             if select.select([sys.stdin], [], [], 0)[0]:
-                print(f"\x1b[F{Color.GREEN}" + self.rocket(multiplier, crash_point))
+                print(f"\x1b[F{Color.GREEN}" + self.rocket(multiplier))
                 input()
                 self.balance += self.bet * multiplier
                 break
             
             if multiplier == crash_point:
-                print(Color.RED + self.rocket(multiplier, crash_point))
+                print(Color.RED + self.rocket(multiplier))
                 break
             
             multiplier *= self.multiplier_tick
@@ -69,12 +69,13 @@ class Crash:
                 multiplier = crash_point
     
     
-    def rocket(self, multiplier, crash_point):
-        result = f"{multiplier:.2f}x 🚀"
-        width = os.get_terminal_size().columns
+    def rocket(self, multiplier):
+        result = f"[{multiplier:.2f}x]🚀"
+        width = os.get_terminal_size().columns - len(result) - 1
         distance = (1 - 1 / (multiplier**0.5)) * width
-        trail_len = distance - len(result)
-        return "#" * round(trail_len) + result
+        trail_len = round(distance) + 1
+        trail = self.rocket_trail[-trail_len::]
+        return trail + result
             
             
 
