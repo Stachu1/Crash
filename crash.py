@@ -27,25 +27,6 @@ class Crash:
         if rnd == 0:
             return self.get_crash_point()
         return 1 * (1 - self.fee) / (rnd)
-
-
-    def go(self, crash_point):
-        multiplier = 1
-        while True:
-            print(f"{multiplier:.2f}x", end="\r")
-            
-            if multiplier * self.multiplier_tick >= crash_point:
-                print(f"{Color.RED}{multiplier:.2f}x{Color.RESET}")
-                break
-            
-            multiplier *= self.multiplier_tick
-
-            time.sleep(0.1)
-            if select.select([sys.stdin], [], [], 0)[0]:
-                print(f"\x1b[F{Color.GREEN}{multiplier:.2f}x{Color.RESET}")
-                input()
-                self.balance += self.bet * multiplier
-                break
     
     
     def run(self):
@@ -67,6 +48,25 @@ class Crash:
         except KeyboardInterrupt:
             print(f"\x1b[G\x1b[2K{Color.YELLOW}Closing...")
             sys.exit(0)
+    
+    
+    def go(self, crash_point):
+        multiplier = 1
+        while True:
+            print(f"{multiplier:.2f}x", end="\r")
+            
+            if multiplier * self.multiplier_tick >= crash_point:
+                print(f"{Color.RED}{multiplier:.2f}x🚀{Color.RESET}")
+                break
+            
+            multiplier *= self.multiplier_tick
+
+            time.sleep(0.1)
+            if select.select([sys.stdin], [], [], 0)[0]:
+                print(f"\x1b[F{Color.GREEN}{multiplier:.2f}x🚀{Color.RESET}")
+                input()
+                self.balance += self.bet * multiplier
+                break
             
             
 
