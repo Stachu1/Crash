@@ -15,9 +15,10 @@ class Color:
 
 
 class Crash:
-    def __init__(self, balance=100, fee=0):
+    def __init__(self, balance=100, fee=0, multiplier_tick=1.01):
         self.balance = balance
         self.fee = fee
+        self.multiplier_tick = multiplier_tick
         self.bet = None
     
     
@@ -28,21 +29,22 @@ class Crash:
         return 1 * (1 - self.fee) / (rnd)
 
 
-    def start_round(self, crash_point):
-        mulimlier = 1
+    def go(self, crash_point):
+        multiplier = 1
         while True:
-            print(f"{round(mulimlier, 2)}x", end="\r")
+            print(f"{multiplier:.2f}x", end="\r")
             
-            mulimlier += 0.01
-            if mulimlier >= crash_point:
-                print(f"{Color.RED}{round(mulimlier, 2)}x{Color.RESET}")
+            if multiplier * self.multiplier_tick >= crash_point:
+                print(f"{Color.RED}{multiplier:.2f}x{Color.RESET}")
                 break
             
+            multiplier *= self.multiplier_tick
+
             time.sleep(0.1)
             if select.select([sys.stdin], [], [], 0)[0]:
-                print(f"\x1b[F{Color.GREEN}{round(mulimlier, 2)}x{Color.RESET}")
+                print(f"\x1b[F{Color.GREEN}{multiplier:.2f}x{Color.RESET}")
                 input()
-                self.balance += self.bet * mulimlier
+                self.balance += self.bet * multiplier
                 break
     
     
@@ -50,7 +52,7 @@ class Crash:
         try:
             while True:
                 try:
-                    self.bet = float(input("\n" + "="*10 + f" Balance: {Color.CYAN}{round(self.balance, 2)}{Color.RESET} " + "="*10 + "\nBet: "))
+                    self.bet = float(input("\n" + "="*10 + f" Balance: {Color.CYAN}{self.balance:.2f}{Color.RESET} " + "="*10 + "\nBet: "))
                     if self.bet > self.balance:
                         print(f"{Color.RED}Not enough balance{Color.RESET}")
                         continue
@@ -60,7 +62,7 @@ class Crash:
                 
                 self.balance -= self.bet
                 crash_point = self.get_crash_point()
-                self.start_round(crash_point)
+                self.go(crash_point)
                 
         except KeyboardInterrupt:
             print(f"\x1b[G\x1b[2K{Color.YELLOW}Closing...")
