@@ -1,7 +1,4 @@
-import random
-import sys
-import select
-import time
+import sys, select, time, random, os
 
 
 class Color:
@@ -23,17 +20,18 @@ class Crash:
     
     
     def get_crash_point(self):
+        return 1000
         rnd = random.random()
         if rnd == 0:
             return self.get_crash_point()
-        return 1 * (1 - self.fee) / (rnd)
+        return (1 - self.fee) / (rnd)
     
     
     def run(self):
         try:
             while True:
                 try:
-                    self.bet = float(input("\n" + "="*10 + f" Balance: {Color.CYAN}{self.balance:.2f}{Color.RESET} " + "="*10 + "\nBet: "))
+                    self.bet = float(input(f"\n{Color.RESET}" + "="*10 + f" Balance: {Color.CYAN}{self.balance:.2f}{Color.RESET} " + "="*10 + "\nBet: "))
                     if self.bet > self.balance:
                         print(f"{Color.RED}Not enough balance{Color.RESET}")
                         continue
@@ -53,20 +51,30 @@ class Crash:
     def go(self, crash_point):
         multiplier = 1
         while True:
-            print(f"{multiplier:.2f}x", end="\r")
-            
-            if multiplier * self.multiplier_tick >= crash_point:
-                print(f"{Color.RED}{multiplier:.2f}x🚀{Color.RESET}")
-                break
-            
-            multiplier *= self.multiplier_tick
+            print(self.rocket(multiplier, crash_point), end="\r")
 
             time.sleep(0.1)
             if select.select([sys.stdin], [], [], 0)[0]:
-                print(f"\x1b[F{Color.GREEN}{multiplier:.2f}x🚀{Color.RESET}")
+                print(f"\x1b[F{Color.GREEN}" + self.rocket(multiplier, crash_point))
                 input()
                 self.balance += self.bet * multiplier
                 break
+            
+            if multiplier == crash_point:
+                print(Color.RED + self.rocket(multiplier, crash_point))
+                break
+            
+            multiplier *= self.multiplier_tick
+            if multiplier > crash_point:
+                multiplier = crash_point
+    
+    
+    def rocket(self, multiplier, crash_point):
+        result = f"{multiplier:.2f}x 🚀"
+        width = os.get_terminal_size().columns
+        distance = (1 - 1 / (multiplier**0.5)) * width
+        trail_len = distance - len(result)
+        return "#" * round(trail_len) + result
             
             
 
