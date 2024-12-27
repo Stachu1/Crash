@@ -18,7 +18,7 @@ class Crash:
         self.fee = fee
         self.multiplier_tick = multiplier_tick
         self.bet = None
-        self.rocket_trail = " "*200 + "."*50 + f",,,:;;*!!&&%$#@@"
+        self.rocket_trail = "."*50 + f",`,`:;*!&%$%#@#@"
     
     def get_crash_point(self):
         rnd = random.random()
@@ -55,7 +55,7 @@ class Crash:
 
             time.sleep(0.1)
             if select.select([sys.stdin], [], [], 0)[0]:
-                print(f"\x1b[F{Color.GREEN}" + self.rocket(multiplier))
+                print(f"\x1b[F{Color.GREEN}" + self.rocket(multiplier) + f" {Color.RESET}Crashed at {Color.PURPLE}{crash_point:.2f}x")
                 input()
                 self.balance += self.bet * multiplier
                 break
@@ -74,7 +74,7 @@ class Crash:
         width = os.get_terminal_size().columns - len(result) - 1
         distance = (1 - 1 / (multiplier**0.5)) * width
         trail_len = round(distance) + 1
-        trail = self.rocket_trail[-trail_len::]
+        trail = (" "*width + self.rocket_trail)[-trail_len::]
         return trail + result
             
             
