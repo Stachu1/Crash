@@ -81,6 +81,6 @@ class Crash:
 
 
 if __name__ == "__main__":
-    crash = Crash()
+    crash = Crash(balance=100, fee=0.02, multiplier_tick=1.01)
     crash.run()
     
